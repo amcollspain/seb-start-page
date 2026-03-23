@@ -2,10 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-
-  <!-- LOAD CONFIG -->
   <script src="config.js"></script>
-
   <title>SEB Session</title>
 
   <style>
@@ -56,14 +53,13 @@
 
 <div class="instruction" id="instruction"></div>
 
-<!-- PIN SECTION -->
 <div id="pin-section">
-  <input type="password" id="pin" placeholder="Enter invigilator PIN" style="padding:10px; font-size:16px;">
+  <input type="password" id="pin" placeholder="Invigilator PIN"
+    style="padding:10px; font-size:16px;">
   <br>
   <button class="button" onclick="checkPIN()">Unlock</button>
 </div>
 
-<!-- LOGIN BUTTON -->
 <div id="login-section" style="display:none;">
   <button class="button"
     onclick="window.location.href='https://courses.mizzouk12.missouri.edu/login/canvas'">
@@ -72,14 +68,18 @@
 </div>
 
 <script>
-document.getElementById('banner').innerText =
-  `${SCHOOL_NAME} – ${SESSION_NAME} (${SESSION_DATE})`;
+// ===== GET TODAY =====
+function todayStr() {
+  return new Date().toISOString().split("T")[0];
+}
 
-document.getElementById('banner').style.backgroundColor = BANNER_COLOR;
+// ===== FIND SESSION =====
+function getSession() {
+  const today = todayStr();
+  return SESSION_RANGES.find(s => today >= s.start && today <= s.end);
+}
 
-document.getElementById('instruction').innerText =
-  "Wait for invigilator approval before proceeding.";
-
+// ===== HASH FUNCTION =====
 async function sha256(str) {
   const buffer = new TextEncoder().encode(str);
   const hash = await crypto.subtle.digest('SHA-256', buffer);
@@ -88,11 +88,36 @@ async function sha256(str) {
     .join('');
 }
 
+// ===== GENERATE DAILY PIN =====
+function generateDailyPIN() {
+  const date = todayStr();
+  return SECRET + "-" + date;
+}
+
+// ===== UI SETUP =====
+const session = getSession();
+const today = todayStr();
+
+if (!session) {
+  document.getElementById('banner').innerText =
+    `${SCHOOL_NAME} – No Active Session (${today})`;
+  document.getElementById('banner').style.backgroundColor = "#888";
+} else {
+  document.getElementById('banner').innerText =
+    `${SCHOOL_NAME} – ${session.name} (${today})`;
+  document.getElementById('banner').style.backgroundColor = session.color;
+}
+
+document.getElementById('instruction').innerText =
+  "Wait for invigilator approval before proceeding.";
+
+// ===== PIN CHECK =====
 async function checkPIN() {
   const entered = document.getElementById('pin').value;
-  const enteredHash = await sha256(entered);
 
-  if (enteredHash === PIN_HASH) {
+  const correct = generateDailyPIN();
+
+  if (entered === correct) {
     document.getElementById('pin-section').style.display = 'none';
     document.getElementById('login-section').style.display = 'block';
   } else {
