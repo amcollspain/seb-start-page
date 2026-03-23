@@ -1,12 +1,11 @@
 // ===== SCHOOL =====
 const SCHOOL_NAME = "American College Spain";
 
-// ===== SECRET FOR DAILY PIN =====
-// Change this ONCE and keep it private
+// ===== SECRET (KEEP PRIVATE) =====
 const SECRET = "ACS-EXAMS-2026";
 
 // ===== SESSION DATE RANGES =====
-// You edit this ONLY when term dates change
+// Edit ONLY when term dates change
 
 const SESSION_RANGES = [
   {
