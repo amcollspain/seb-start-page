@@ -90,8 +90,19 @@ async function sha256(str) {
 
 // ===== GENERATE DAILY PIN =====
 function generateDailyPIN() {
-  const date = todayStr();
-  return SECRET + "-" + date;
+  const input = SECRET + todayStr();
+
+  let hash = 0;
+  for (let i = 0; i < input.length; i++) {
+    hash = (hash << 5) - hash + input.charCodeAt(i);
+    hash |= 0; // Convert to 32bit integer
+  }
+
+  // Convert to positive 4-digit number
+  const pin = Math.abs(hash % 10000);
+
+  // Ensure always 4 digits (e.g. 0042)
+  return pin.toString().padStart(4, '0');
 }
 
 // ===== UI SETUP =====
@@ -114,7 +125,6 @@ document.getElementById('instruction').innerText =
 // ===== PIN CHECK =====
 async function checkPIN() {
   const entered = document.getElementById('pin').value;
-
   const correct = generateDailyPIN();
 
   if (entered === correct) {
