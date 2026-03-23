@@ -80,9 +80,19 @@ document.getElementById('banner').style.backgroundColor = BANNER_COLOR;
 document.getElementById('instruction').innerText =
   "Wait for invigilator approval before proceeding.";
 
-function checkPIN() {
+async function sha256(str) {
+  const buffer = new TextEncoder().encode(str);
+  const hash = await crypto.subtle.digest('SHA-256', buffer);
+  return Array.from(new Uint8Array(hash))
+    .map(b => b.toString(16).padStart(2, '0'))
+    .join('');
+}
+
+async function checkPIN() {
   const entered = document.getElementById('pin').value;
-  if (entered === INVIGILATOR_PIN) {
+  const enteredHash = await sha256(entered);
+
+  if (enteredHash === PIN_HASH) {
     document.getElementById('pin-section').style.display = 'none';
     document.getElementById('login-section').style.display = 'block';
   } else {
