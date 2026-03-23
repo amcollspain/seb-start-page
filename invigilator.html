@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Invigilator PIN</title>
+
+  <script src="config.js"></script>
+
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      background: #111;
+      color: white;
+      margin: 0;
+      padding: 20px;
+    }
+    .box {
+      margin-top: 50px;
+      padding: 30px;
+      border-radius: 12px;
+    }
+    .pin {
+      font-size: 80px;
+      font-weight: bold;
+      margin: 20px 0;
+    }
+    .session {
+      font-size: 22px;
+      margin-bottom: 10px;
+    }
+    .date {
+      font-size: 18px;
+      opacity: 0.8;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="box" id="box">
+  <div class="session" id="session"></div>
+  <div class="date" id="date"></div>
+  <div class="pin" id="pin"></div>
+</div>
+
+<script>
+// ===== DATE =====
+function todayStr() {
+  return new Date().toISOString().split("T")[0];
+}
+
+// ===== FIND SESSION =====
+function getSession() {
+  const today = todayStr();
+  return SESSION_RANGES.find(s => today >= s.start && today <= s.end);
+}
+
+// ===== PIN GENERATOR (same as SEB page) =====
+function generateDailyPIN() {
+  const input = SECRET + todayStr();
+
+  let hash = 0;
+  for (let i = 0; i < input.length; i++) {
+    hash = (hash << 5) - hash + input.charCodeAt(i);
+    hash |= 0;
+  }
+
+  const pin = Math.abs(hash % 10000);
+  return pin.toString().padStart(4, '0');
+}
+
+// ===== UI =====
+const today = todayStr();
+const session = getSession();
+
+const pin = generateDailyPIN();
+
+document.getElementById("pin").innerText = pin;
+document.getElementById("date").innerText = today;
+
+if (session) {
+  document.getElementById("session").innerText = session.name;
+  document.getElementById("box").style.backgroundColor = session.color;
+} else {
+  document.getElementById("session").innerText = "No Active Session";
+  document.getElementById("box").style.backgroundColor = "#444";
+}
+</script>
+
+</body>
+</html>
