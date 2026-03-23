@@ -68,7 +68,7 @@
 </div>
 
 <script>
-// ===== GET TODAY =====
+// ===== DATE =====
 function todayStr() {
   return new Date().toISOString().split("T")[0];
 }
@@ -79,35 +79,23 @@ function getSession() {
   return SESSION_RANGES.find(s => today >= s.start && today <= s.end);
 }
 
-// ===== HASH FUNCTION =====
-async function sha256(str) {
-  const buffer = new TextEncoder().encode(str);
-  const hash = await crypto.subtle.digest('SHA-256', buffer);
-  return Array.from(new Uint8Array(hash))
-    .map(b => b.toString(16).padStart(2, '0'))
-    .join('');
-}
-
-// ===== GENERATE DAILY PIN =====
+// ===== 4-DIGIT PIN =====
 function generateDailyPIN() {
   const input = SECRET + todayStr();
 
   let hash = 0;
   for (let i = 0; i < input.length; i++) {
     hash = (hash << 5) - hash + input.charCodeAt(i);
-    hash |= 0; // Convert to 32bit integer
+    hash |= 0;
   }
 
-  // Convert to positive 4-digit number
   const pin = Math.abs(hash % 10000);
-
-  // Ensure always 4 digits (e.g. 0042)
   return pin.toString().padStart(4, '0');
 }
 
-// ===== UI SETUP =====
-const session = getSession();
+// ===== UI =====
 const today = todayStr();
+const session = getSession();
 
 if (!session) {
   document.getElementById('banner').innerText =
@@ -123,7 +111,7 @@ document.getElementById('instruction').innerText =
   "Wait for invigilator approval before proceeding.";
 
 // ===== PIN CHECK =====
-async function checkPIN() {
+function checkPIN() {
   const entered = document.getElementById('pin').value;
   const correct = generateDailyPIN();
 
