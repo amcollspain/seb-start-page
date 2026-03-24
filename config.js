@@ -1,5 +1,5 @@
 // ===== SCHOOL =====
-const SCHOOL_NAME = "American College Spain";
+const SCHOOL_NAME = "The American College Spain";
 
 // ===== SECRET (KEEP PRIVATE) =====
 const SECRET = "ACS-EXAMS-2026";
@@ -11,7 +11,7 @@ const SESSION_RANGES = [
   {
     name: "Midterm Spring",
     start: "2026-03-20",
-    end: "2026-03-27",
+    end: "2026-04-30",
     color: "#00274c"
   },
   {
